@@ -1,3 +1,6 @@
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Header from "./components/Header";
 import SalesCard from "./components/SalesCard";
 
@@ -6,6 +9,8 @@ import "./App.css";
 const App = () => {
   return (
     <>
+      <ToastContainer />
+
       <Header />
 
       <main>

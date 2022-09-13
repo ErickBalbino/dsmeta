@@ -4,6 +4,7 @@ import { BASE_URL } from "../../utils/requests";
 import notificationIcon from "../../assets/notification-icon.svg";
 
 import "./styles.css";
+import { toast } from "react-toastify";
 
 type Props = {
   saleId: number;
@@ -14,10 +15,10 @@ const NotificationButton = ({ saleId }: Props) => {
     axios
       .get(`${BASE_URL}/sales/${saleId}/notification`)
       .then((resp) => {
-        alert("SMS enviado com sucesso!");
+        toast.info("SMS enviado com sucesso!");
       })
       .catch((err) => {
-        alert("Ocorreu um erro ao enviar!");
+        toast.info("Ops, ocorreu um erro!");
       });
   };
 
