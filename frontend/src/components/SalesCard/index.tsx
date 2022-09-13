@@ -10,21 +10,30 @@ import { Sale } from "../../models/Sale";
 
 const SalesCard = () => {
   const [sales, setSales] = useState<Sale[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const min = new Date(new Date().setDate(new Date().getDate() - 365));
 
   const [minDate, setMinDate] = useState(min);
   const [maxDate, setMaxDate] = useState(new Date());
 
   useEffect(() => {
+    const dmin = minDate.toISOString().slice(0, 10);
+    const dmax = maxDate.toISOString().slice(0, 10);
+
+    setLoading(true);
+
     axios
-      .get(`${BASE_URL}/sales`)
+      .get(`${BASE_URL}/sales?minDate=${dmin}&maxDate=${dmax}`)
       .then((resp) => {
         setSales(resp.data.content);
       })
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+
+    setLoading(false);
+  }, [minDate, maxDate]);
 
   return (
     <div className="dsmeta-card">
@@ -62,30 +71,46 @@ const SalesCard = () => {
             </tr>
           </thead>
           <tbody>
-            {sales.map((sale) => {
-              return (
-                <tr key={sale.id}>
-                  <td className="show992">{sale.id}</td>
-                  <td className="show576">{sale.date}</td>
-                  <td>{sale.sellerName}</td>
-                  <td className="show992">{sale.visited}</td>
-                  <td className="show992">{sale.deals}</td>
-                  <td>
-                    {sale.amount.toLocaleString("pt-br", {
-                      style: "currency",
-                      currency: "BRL",
-                    })}
-                  </td>
-                  <td>
-                    <div className="dsmeta-red-btn-container">
-                      <NotificationButton />
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
+            {sales.length > 0 &&
+              loading === false &&
+              sales.map((sale) => {
+                return (
+                  <tr key={sale.id}>
+                    <td className="show992">{sale.id}</td>
+                    <td className="show576">
+                      {new Date(sale.date).toLocaleDateString()}
+                    </td>
+                    <td>{sale.sellerName}</td>
+                    <td className="show992">{sale.visited}</td>
+                    <td className="show992">{sale.deals}</td>
+                    <td>
+                      {sale.amount.toLocaleString("pt-br", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </td>
+                    <td>
+                      <div className="dsmeta-red-btn-container">
+                        <NotificationButton saleId={sale.id} />
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
           </tbody>
         </table>
+
+        {loading && (
+          <tbody>
+            <p>Carregando dados...</p>
+          </tbody>
+        )}
+
+        {sales.length === 0 && loading === false && (
+          <tbody>
+            <p>Este periodo não possui registro de venda!</p>
+          </tbody>
+        )}
       </div>
     </div>
   );
